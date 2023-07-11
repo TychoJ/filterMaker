@@ -4,6 +4,6 @@
 #include <stdint.h>
 #include <complex.h>
 
-void chebyshev(double cutOffFreq, uint16_t order, double rimple, double complex *poles);
+void chebyshev(double cutOffFreq, uint16_t order, double ripple, double complex *poles);
 
 #endif // CALC_POLES_H

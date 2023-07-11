@@ -9,8 +9,8 @@
 #endif
 
 
-void chebyshev(double cutOffFreq, uint16_t order, double rimple, double complex *poles) {
-    double rimpleFactor = sqrt(pow(10, rimple/10)-1);
+void chebyshev(double cutOffFreq, uint16_t order, double ripple, double complex *poles) {
+    double rimpleFactor = sqrt(pow(10, ripple/10)-1);
     double A  = asinh(1/rimpleFactor)/order;
     //double sinhA = sinh(A);
     //double kc = tanh(A);
