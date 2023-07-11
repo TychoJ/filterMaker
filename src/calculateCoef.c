@@ -162,6 +162,37 @@ int main (int argc, char **argv) {
         }
     }
 
+    double complex  num;
+    double complex *den = malloc( (arguments.order + 1) * sizeof(double complex) );
+    if (den == NULL) {
+        printf("Not enough memory\n");
+        exit(EXIT_FAILURE);
+    }
+
+    analogNum(poles, arguments.order, &num);
+
+    if (!arguments.silent) {
+        printf("Numerator:%f + %fj\n",
+            creal(num),
+            cimag(num));
+    }
+
+    analogDen(poles, arguments.order, den);
+
+    // Output all the polynomials
+    if (!arguments.silent) {
+        printf("Denominator: ");
+        for (int32_t i = arguments.order; i >= 0; i--) {
+            printf("(%f + %fj)s^%d%s",
+                creal(den[i]),
+                cimag(den[i]),
+                i,
+                i > 0 ? " + " : "");
+        }
+        printf("\n");
+    }
+
+
 
     // Create polynomials
 
