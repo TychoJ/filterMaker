@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <complex.h>
 #include <stdlib.h>
+#include <math.h>
 #include "polynomial.h"
 
 void analogNum(double complex *poles, uint16_t order, double complex *numerator) {
@@ -13,7 +14,7 @@ void analogNum(double complex *poles, uint16_t order, double complex *numerator)
     return;
 }
 
-// The double complex *denominator array should have length order + 1
+// The double complex *denominator array should have length: order + 1
 void analogDen(double complex *poles, uint16_t order, double complex *denominator) {
 
     uint8_t  numArrays = 2;
@@ -30,13 +31,14 @@ void analogDen(double complex *poles, uint16_t order, double complex *denominato
         printf("Not enough memory\n");
         exit(EXIT_FAILURE);
     }
+    
     for (uint16_t i = 0; i < numArrays; i++) {
         polynomials[i] = malloc(numPoly * sizeof(double complex *));
         if (polynomials[i] == NULL) {
             printf("Not enough memory\n");
             exit(EXIT_FAILURE);
         }
-        for (uint32_t j = 0; j < polyDepth; j++) {
+        for (uint32_t j = 0; j < numPoly; j++) {
             polynomials[i][j] = malloc(polySizeAlloc);
             if (polynomials[i][j] == NULL) {
                 printf("Not enough memory\n");
@@ -44,11 +46,11 @@ void analogDen(double complex *poles, uint16_t order, double complex *denominato
             }
         }
     }
-
-    // Fill the first order polynomials (1s-Pi)
+    
+    // Fill the first order polynomials in array 0 (1s-Pi)
     for (uint32_t i = 0; i < order; i++) {
-        polynomials[0][i][0] = poles[i];
-        polynomials[0][i][1] = 0 + 0 * I;
+        polynomials[0][i][0] = -1 * poles[i];
+        polynomials[0][i][1] = 1 + 0 * I;
 
         // Set the rest of the polynomial to 0+0j
         for (uint32_t j = 2; j < polySize; j++) {
@@ -60,17 +62,50 @@ void analogDen(double complex *poles, uint16_t order, double complex *denominato
             polynomials[1][i][j] = 0 + 0 * I;
         }
     }
-
-        
-
-
-    for (uint32_t i = 0; i <= (order + oddOrder); i++) {
-
+    
+    // Set the second array polynomials to zero
+    for (uint32_t i = 0; i < numPoly; i++) {
+        for (uint32_t j = 0; j < polyDepth; j++) {
+            polynomials[1][i][j] = 0 + 0 * I;
+        }
     }
 
+    // Go through order/2 rounded up steps
+    uint32_t steps = (order + oddOrder)/2;
+    for (uint32_t step = 1; step <= steps; step++) {
+        for (uint32_t combine = 0; combine < steps/(2 * (step)); combine++) {
+            uint8_t arrFrom = !(step%2);
+            uint8_t arrTo   = step%2;
+            uint16_t polyIncrement = (uint16_t) pow(2, step);
+            uint16_t polyX = polyIncrement * combine;
+            uint16_t polyY = (uint16_t) combine * polyIncrement + pow(2, step - 1);
+
+            // Detect odd last thingies :)
+            uint16_t isLastPolyOdd = order;
+            for (uint16_t i = 0; i < step; i++) {
+                isLastPolyOdd = (isLastPolyOdd + (isLastPolyOdd % 2))/2;
+            }
+            isLastPolyOdd %= 2;
+
+
+            if (isLastPolyOdd) {
+                double complex *temp;
+                temp = polynomials[arrFrom][polyX];
+                polynomials[arrFrom][polyX] = polynomials[arrTo][polyX];
+                polynomials[arrTo][polyX] = temp;
+            }
+            else {
+                polyMul(polynomials[arrFrom][polyX], polynomials[arrFrom][polyY], (uint16_t) pow(2, step - 1), polynomials[arrTo][polyX]);
+            }
+
+        }
+    }
 
     // Free memory and return
-    for (uint32_t i = 0; i < order + 1; i++) {
+    for (uint32_t i = 0; i < numArrays; i++) {
+        for (uint32_t j = 0; j < numPoly; j++){
+            free(polynomials[i][j]);
+        }
         free(polynomials[i]);
     }
     free(polynomials);
