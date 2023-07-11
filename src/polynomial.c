@@ -4,6 +4,8 @@
 #include <math.h>
 #include "polynomial.h"
 
+static void combinePoly(double complex ***polynomials, uint16_t order, double complex *ret);
+
 void analogNum(double complex *poles, uint16_t order, double complex *numerator) {
     numerator[0] = poles[0];
 
@@ -73,6 +75,25 @@ void analogDen(double complex *poles, uint16_t order, double complex *denominato
         }
     }
 
+    combinePoly(polynomials, order, denominator);
+
+    // Free memory and return
+    for (uint32_t i = 0; i < numArrays; i++) {
+        for (uint32_t j = 0; j < numPoly; j++){
+            free(polynomials[i][j]);
+        }
+        free(polynomials[i]);
+    }
+    free(polynomials);
+
+    return;
+}
+
+// The double complex *ret array should have length: order + 1
+static void combinePoly(double complex ***polynomials, uint16_t order, double complex *ret) {
+    
+    uint8_t  oddOrder  = order % 2;
+
     printf("Start calculating the polynomial\n");
     // Go through order/2 rounded up steps
     uint32_t steps = (order + oddOrder)/2;
@@ -108,38 +129,12 @@ void analogDen(double complex *poles, uint16_t order, double complex *denominato
                 polynomials[arrTo][polyX] = temp;
             }
             else {
-                //printf("poly[%d] =", polyX);
-                //for (int32_t i = order; i >= 0; i--) {
-                //    printf("%.2f+%.2fj%s",
-                //        creal(polynomials[arrFrom][polyX][i]),
-                //        cimag(polynomials[arrFrom][polyX][i]),
-                //        i > 0 ? " | ": "");
-                //}
-                //printf("\n");
-                //printf("poly[%d] =", polyY);
-                //for (int32_t i = order; i >= 0; i--) {
-                //    printf("%.2f+%.2fj%s",
-                //        creal(polynomials[arrFrom][polyY][i]),
-                //        cimag(polynomials[arrFrom][polyY][i]),
-                //        i > 0 ? " | ": "");
-                //}
-                //printf("\n");
-
                 polyMul(polynomials[arrFrom][polyX], polynomials[arrFrom][polyY], (uint16_t) pow(2, step - 1), polynomials[arrTo][polyX]);
-
-                //printf("polyOut =");
-                //for (int32_t i = order; i >= 0; i--) {
-                //    printf("%.2f+%.2fj%s",
-                //        creal(polynomials[arrTo][polyX][i]),
-                //        cimag(polynomials[arrTo][polyX][i]),
-                //        i > 0 ? " | ": "");
-                //}
-                //printf("\n");
 
                 printf("Check for last step\n");
                 if (step + 1 > steps) {
                     for (uint32_t i = 0; i <= order ; i++) {
-                        denominator[i] = polynomials[arrTo][polyX][i];
+                        ret[i] = polynomials[arrTo][polyX][i];
                     }
                 }
             }
@@ -147,16 +142,6 @@ void analogDen(double complex *poles, uint16_t order, double complex *denominato
         }
     }
 
-    // Free memory and return
-    for (uint32_t i = 0; i < numArrays; i++) {
-        for (uint32_t j = 0; j < numPoly; j++){
-            free(polynomials[i][j]);
-        }
-        free(polynomials[i]);
-    }
-    free(polynomials);
-
-    return;
 }
 
 // The double complex *numerator array should have length order + 1
