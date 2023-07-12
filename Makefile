@@ -38,7 +38,7 @@ OBJFOLDER = obj/
 BINFOLDER = bin/
 
 # Project name
-PROJECTNAME = calcdigitalFilterCoef
+PROJECTNAME = filterMaker
 
 # External source code library folders
 EXTFOLDER =

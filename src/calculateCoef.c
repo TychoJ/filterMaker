@@ -22,7 +22,7 @@ const char *argp_program_bug_address =
 
 /* Program documentation. */
 static char doc[] =
-  "cfc3 stands for calculate digital filter coefficients 3 where 3 means three analog poles.";
+  "filterMaker stands for calculate digital filter coefficients 3 where 3 means three analog poles.";
 
 /* A description of the arguments we accept. */
 static char args_doc[] = "";
@@ -194,7 +194,7 @@ int main (int argc, char **argv) {
 
 
 
-    // Create polynomials
+    // //Create polynomials
 
     // Multiply polynomials
 
