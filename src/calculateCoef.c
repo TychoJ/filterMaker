@@ -192,7 +192,52 @@ int main (int argc, char **argv) {
         printf("\n");
     }
 
+    double complex *digNum = malloc( (arguments.order + 1) * sizeof(double complex) );
+    if (digNum == NULL) {
+        printf("Not enough memory\n");
+        exit(EXIT_FAILURE);
+    }
+    double complex *digDen = malloc( (arguments.order + 1) * sizeof(double complex) );
+    if (digDen == NULL) {
+        printf("Not enough memory\n");
+        exit(EXIT_FAILURE);
+    }
 
+    printf("Poles:\n");
+        for (uint32_t i = 0; i < arguments.order; i++) {
+            printf("\tp%d\t=\t%f+%fj\n",
+                i+1,
+                creal(poles[i]),
+                cimag(poles[i]));
+        }
+
+
+    digitalNum(poles, arguments.order, arguments.fSample, digNum);
+    digitalDen(poles, arguments.order, arguments.fSample, digDen);
+    // Output all the polynomials
+    if (!arguments.silent) {
+        printf("digNum: ");
+        for (int32_t i = arguments.order; i >= 0; i--) {
+            printf("(%f + %fj)z^%d%s",
+                creal(digNum[i]),
+                cimag(digNum[i]),
+                i,
+                i > 0 ? " + " : "");
+        }
+        printf("\n");
+    }
+    // Output all the polynomials
+    if (!arguments.silent) {
+        printf("digDen: ");
+        for (int32_t i = arguments.order; i >= 0; i--) {
+            printf("(%f + %fj)z^%d%s",
+                creal(digDen[i]),
+                cimag(digDen[i]),
+                i,
+                i > 0 ? " + " : "");
+        }
+        printf("\n");
+    }
 
     // //Create polynomials
 

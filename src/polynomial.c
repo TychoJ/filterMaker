@@ -145,13 +145,153 @@ static void combinePoly(double complex ***polynomials, uint16_t order, double co
 }
 
 // The double complex *numerator array should have length order + 1
-void digitalNum(double complex *poles, uint16_t order, double complex *numerator) {
+void digitalNum(double complex *poles, uint16_t order, double fSample, double complex *numerator) {
+
+    printf("starting digitalDen\n");
+
+    uint8_t  numArrays = 2;
+    uint8_t  oddOrder  = order % 2;
+    uint32_t numPoly   = order + oddOrder;
+    uint32_t polyDepth = numPoly + 1;
+
+    double samplePeriod = 1 / fSample;
+
+    uint32_t polySizeAlloc = (2 * order + 1 ) * sizeof(double complex);
+    uint32_t polySize      = (2 * order + 1 );
+
+    // allocate memory to store the first order polynomials in
+    double complex ***polynomials = malloc(numArrays * sizeof(double complex **));
+    if (polynomials == NULL) {
+        printf("Not enough memory\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    for (uint16_t i = 0; i < numArrays; i++) {
+        polynomials[i] = malloc(numPoly * sizeof(double complex *));
+        if (polynomials[i] == NULL) {
+            printf("Not enough memory\n");
+            exit(EXIT_FAILURE);
+        }
+        for (uint32_t j = 0; j < numPoly; j++) {
+            polynomials[i][j] = malloc(polySizeAlloc);
+            if (polynomials[i][j] == NULL) {
+                printf("Not enough memory\n");
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
+    
+    printf("Filling the first order polynomials in the array's\n");
+    // Fill the first order polynomials in array 0 Pi*T*z + Pi*T
+    for (uint32_t i = 0; i < order; i++) {
+        polynomials[0][i][0] = poles[i] * samplePeriod;
+        polynomials[0][i][1] = poles[i] * samplePeriod;
+
+        // Set the rest of the polynomial to 0+0j
+        for (uint32_t j = 2; j < polySize; j++) {
+            polynomials[0][i][j] = 0 + 0 * I;
+        }
+
+        // Set the second polynomial array completlly to 0
+        for (uint32_t j = 0; j < polySize; j++) {
+            polynomials[1][i][j] = 0 + 0 * I;
+        }
+    }
+    printf("\n");
+
+    // Set the second array polynomials to zero
+    for (uint32_t i = 0; i < numPoly; i++) {
+        for (uint32_t j = 0; j < polyDepth; j++) {
+            polynomials[1][i][j] = 0 + 0 * I;
+        }
+    }
+
+    combinePoly(polynomials, order, numerator);
+
+    // Free memory and return
+    for (uint32_t i = 0; i < numArrays; i++) {
+        for (uint32_t j = 0; j < numPoly; j++){
+            free(polynomials[i][j]);
+        }
+        free(polynomials[i]);
+    }
+    free(polynomials);
 
     return;
 }
 
 // The double complex *denominator array should have length order + 1
-void digitalDen(double complex *poles, uint16_t order, double complex *denominator) {
+void digitalDen(double complex *poles, uint16_t order, double fSample, double complex *denominator) {
+
+    printf("starting digitalDen\n");
+
+    uint8_t  numArrays = 2;
+    uint8_t  oddOrder  = order % 2;
+    uint32_t numPoly   = order + oddOrder;
+    uint32_t polyDepth = numPoly + 1;
+
+    double samplePeriod = 1 / fSample;
+
+    uint32_t polySizeAlloc = (2 * order + 1 ) * sizeof(double complex);
+    uint32_t polySize      = (2 * order + 1 );
+
+    // allocate memory to store the first order polynomials in
+    double complex ***polynomials = malloc(numArrays * sizeof(double complex **));
+    if (polynomials == NULL) {
+        printf("Not enough memory\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    for (uint16_t i = 0; i < numArrays; i++) {
+        polynomials[i] = malloc(numPoly * sizeof(double complex *));
+        if (polynomials[i] == NULL) {
+            printf("Not enough memory\n");
+            exit(EXIT_FAILURE);
+        }
+        for (uint32_t j = 0; j < numPoly; j++) {
+            polynomials[i][j] = malloc(polySizeAlloc);
+            if (polynomials[i][j] == NULL) {
+                printf("Not enough memory\n");
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
+    
+    printf("Filling the first order polynomials in the array's\n");
+    // Fill the first order polynomials in array 0 ([2-Pi*T]z-(2+Pi*T))
+    for (uint32_t i = 0; i < order; i++) {
+        polynomials[0][i][0] = -1 * (2 + poles[i] * samplePeriod);
+        polynomials[0][i][1] = 2 - poles[i] * samplePeriod;
+
+        // Set the rest of the polynomial to 0+0j
+        for (uint32_t j = 2; j < polySize; j++) {
+            polynomials[0][i][j] = 0 + 0 * I;
+        }
+
+        // Set the second polynomial array completlly to 0
+        for (uint32_t j = 0; j < polySize; j++) {
+            polynomials[1][i][j] = 0 + 0 * I;
+        }
+    }
+    printf("\n");
+
+    // Set the second array polynomials to zero
+    for (uint32_t i = 0; i < numPoly; i++) {
+        for (uint32_t j = 0; j < polyDepth; j++) {
+            polynomials[1][i][j] = 0 + 0 * I;
+        }
+    }
+
+    combinePoly(polynomials, order, denominator);
+
+    // Free memory and return
+    for (uint32_t i = 0; i < numArrays; i++) {
+        for (uint32_t j = 0; j < numPoly; j++){
+            free(polynomials[i][j]);
+        }
+        free(polynomials[i]);
+    }
+    free(polynomials);
 
     return;
 }
