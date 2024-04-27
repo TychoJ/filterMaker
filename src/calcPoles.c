@@ -21,7 +21,7 @@ void chebyshev(double cutOffFreq, uint16_t order, double ripple, double complex 
     //    sinh(A), cosh(A));
 
     for (uint32_t i = 0; i < order; i++) {
-        poles[i] = cutOffFreq * (-1 * sinh(A) * sin(( M_PI * ( 2*(i+1) - 1) )/( 2 * order )) + I*cosh(A)*cos(( M_PI * ( 2*(i+1) - 1) )/( 2 * order )));
+        poles[i] = cutOffFreq * 2 * M_PI * (-1 * sinh(A) * sin(( M_PI * ( 2*(i+1) - 1) )/( 2 * order )) + I*cosh(A)*cos(( M_PI * ( 2*(i+1) - 1) )/( 2 * order )));
     }
 
     return;
