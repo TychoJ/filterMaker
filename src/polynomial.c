@@ -97,12 +97,12 @@ static void combinePoly(double complex ***polynomials, uint16_t order, double co
     printf("Start calculating the polynomial\n");
     // Go through order/2 rounded up steps
     uint32_t steps = (order + oddOrder)/2;
-    printf("number of steps: %d\n", steps);
+    // printf("number of steps: %d\n", steps);
 
     for (uint32_t step = 1; step <= steps; step++) {
-        printf("\tperforming step %d\n", step);
+        // printf("\tperforming step %d\n", step);
 
-        printf("\t\tNumber of combines: %d\n", steps/((step)));
+        // printf("\t\tNumber of combines: %d\n", steps/((step)));
         for (uint32_t combine = 0; combine < steps/((step)); combine++) {
 
             uint8_t arrFrom = !(step%2);
@@ -111,15 +111,15 @@ static void combinePoly(double complex ***polynomials, uint16_t order, double co
             uint16_t polyX = polyIncrement * combine;
             uint16_t polyY = (uint16_t) combine * polyIncrement + pow(2, step - 1);
 
-            printf("calculate if there was an uneven number of results last step\n");
+            // printf("calculate if there was an uneven number of results last step\n");
             // Detect odd last thingies :)
             uint16_t isLastPolyOdd = order;
-            printf("\torder: %d\n", isLastPolyOdd);
+            // printf("\torder: %d\n", isLastPolyOdd);
             for (uint16_t i = 1; i < step; i++) {
                 isLastPolyOdd = (isLastPolyOdd + (isLastPolyOdd % 2))/2;
             }
             isLastPolyOdd %= 2;
-            printf("\tisLastPolyOdd final: %d\n", isLastPolyOdd);
+            // printf("\tisLastPolyOdd final: %d\n", isLastPolyOdd);
 
 
             if (isLastPolyOdd && (combine + 1 >= steps/((step)))) {
@@ -131,7 +131,7 @@ static void combinePoly(double complex ***polynomials, uint16_t order, double co
             else {
                 polyMul(polynomials[arrFrom][polyX], polynomials[arrFrom][polyY], (uint16_t) pow(2, step - 1), polynomials[arrTo][polyX]);
 
-                printf("Check for last step\n");
+                // printf("Check for last step\n");
                 if (step + 1 > steps) {
                     for (uint32_t i = 0; i <= order ; i++) {
                         ret[i] = polynomials[arrTo][polyX][i];

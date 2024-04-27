@@ -155,7 +155,7 @@ int main (int argc, char **argv) {
     if (!arguments.silent) {
         printf("Poles:\n");
         for (uint32_t i = 0; i < arguments.order; i++) {
-            printf("\tp%d\t=\t%f+%fj\n",
+            printf("\tp%d\t=\t%.10f+%.10fj\n",
                 i+1,
                 creal(poles[i]),
                 cimag(poles[i]));
@@ -203,13 +203,13 @@ int main (int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    printf("Poles:\n");
-        for (uint32_t i = 0; i < arguments.order; i++) {
-            printf("\tp%d\t=\t%f+%fj\n",
-                i+1,
-                creal(poles[i]),
-                cimag(poles[i]));
-        }
+    // printf("Poles:\n");
+    //     for (uint32_t i = 0; i < arguments.order; i++) {
+    //         printf("\tp%d\t=\t%f+%fj\n",
+    //             i+1,
+    //             creal(poles[i]),
+    //             cimag(poles[i]));
+    //     }
 
 
     digitalNum(poles, arguments.order, arguments.fSample, digNum);
